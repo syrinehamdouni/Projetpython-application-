@@ -4,4 +4,11 @@ beautifulsoup4
 matplotlib
 seaborn
 numpy
+fastapi
+uvicorn
+torch
+torchvision
+pillow
+python-multipart
+
 
