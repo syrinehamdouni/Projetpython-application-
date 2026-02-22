@@ -1,61 +1,68 @@
-from fastapi import FastAPI, File, UploadFile
-from fastapi.responses import JSONResponse
+import mlflow.pyfunc
 import torch
-import torch.nn as nn
-from torchvision import models, transforms
+import torchvision.transforms as transforms
 from PIL import Image
 import io
 
-app = FastAPI()
+from fastapi import FastAPI, UploadFile, File
+from fastapi.responses import JSONResponse
 
-DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+# -------------------
+# CONFIG
+# -------------------
 
-# Classes
-classes = ['battery','biological','cardboard','clothes',
-           'glass','metal','paper','plastic','shoes','trash']
+CLASSES = [
+    'battery', 'biological', 'cardboard', 'clothes',
+    'glass', 'metal', 'paper', 'plastic', 'shoes', 'trash'
+]
 
-# Load model
-model = models.resnet18(pretrained=False)
-model.fc = nn.Linear(model.fc.in_features, len(classes))
-model.load_state_dict(torch.load("models/trash_model.pth", map_location=DEVICE))
-model.to(DEVICE)
-model.eval()
 
-# Transform
+MODEL_ID = "m-206d43e6afde4c4f99d00add2c720980"
+model_uri = f"models:/{MODEL_ID}"
+
+# -------------------
+# LOAD MODEL FROM MLFLOW
+# -------------------
+
+model = mlflow.pyfunc.load_model(model_uri)
+print(" Model loaded from MLflow using Model ID")
+
+# -------------------
+# FASTAPI
+# -------------------
+
+app = FastAPI(title="Waste Classification API")
+
+# Image transform
 transform = transforms.Compose([
-    transforms.Resize((224,224)),
-    transforms.ToTensor(),
-    transforms.Normalize([0.485,0.456,0.406],
-                         [0.229,0.224,0.225])
+    transforms.Resize((224, 224)),
+    transforms.ToTensor()
 ])
 
-THRESHOLD = 0.7  # أقل probability يعتبر uncertain
 
 @app.get("/")
 def home():
-    return {"message": "Trash Classification API is running"}
+    return {"message": "API is running "}
+
 
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
-    # قراءة الصورة
-    image_bytes = await file.read()
-    image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
-    
-    img = transform(image).unsqueeze(0).to(DEVICE)
 
-    with torch.no_grad():
-        outputs = model(img)
-        probs = torch.softmax(outputs, dim=1)
-        
-        # Top-3 predictions
-        top_probs, top_idx = torch.topk(probs, 3)
-        top3 = [{"class": classes[i], "probability": p.item()} 
-                for i, p in zip(top_idx[0], top_probs[0])]
+    contents = await file.read()
+    image = Image.open(io.BytesIO(contents)).convert("RGB")
 
-    result = {"top3": top3}
+    img_tensor = transform(image)
+    img_tensor = img_tensor.unsqueeze(0)  # batch dimension
 
-    # Warning لو أقل من THRESHOLD
-    if top3[0]["probability"] < THRESHOLD:
-        result["warning"] = "uncertain prediction"
+   
+    preds = model.predict(img_tensor.numpy())
 
-    return JSONResponse(result)
+    preds_tensor = torch.tensor(preds)
+    probs = torch.softmax(preds_tensor, dim=1)
+
+    confidence, predicted_class = torch.max(probs, 1)
+
+    return JSONResponse({
+        "predicted_class": CLASSES[predicted_class.item()],
+        "confidence": float(confidence.item())
+    })

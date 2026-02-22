@@ -62,6 +62,29 @@ battery, biological, cardboard, clothes, glass, metal, paper, plastic, shoes, tr
 - TensorFlow / Keras (optional NLP)  
 - Scikit-learn, NLTK, SpaCy  
 - NumPy, Pandas, Matplotlib  
+- FastAPI, Uvicorn  
+
+---
+
+##  API
+
+The project includes a FastAPI application for serving the waste classification model.
+
+### Endpoints
+
+- `GET /`: Root endpoint
+- `GET /health`: Health check
+- `POST /predict`: Predict waste category from image upload
+
+### Running the API
+
+1. Install dependencies: `pip install -r requirements.txt`
+2. Run the server: `uvicorn app:app --reload`
+3. Access Swagger UI at `http://127.0.0.1:8000/docs`
+
+### Testing
+
+Run tests with: `pytest test_api.py`
 
 ---
 

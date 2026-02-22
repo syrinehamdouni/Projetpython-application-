@@ -1,0 +1,14 @@
+pandas
+requests
+beautifulsoup4
+matplotlib
+seaborn
+numpy
+fastapi
+uvicorn
+pillow
+python-multipart
+mlflow
+scikit-learn
+pytest
+tqdm
