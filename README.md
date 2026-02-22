@@ -4,99 +4,88 @@ AI-powered smart waste management system combining **Image Classification** and 
 
 ---
 
-##  Overview
+## Overview
 
-- Classifies waste images into 10 categories:
-battery, biological, cardboard, clothes, glass, metal, paper, plastic, shoes, trash
-- Analyzes text complaints to detect:
-- Category (Collection, Recycling, Hazardous, General)
-- Priority (High, Medium, Low)
-- Risk (Health, Environmental, Low)
-- Supports hybrid decision-making for smart city applications.
+Cleanup App is an AI-based solution designed to:
+
+- Classify waste images into 10 categories  
+- Analyze citizen complaints using NLP  
+- Support smart recycling and environmental monitoring  
+
+### Waste Categories
+`battery • biological • cardboard • clothes • glass • metal • paper • plastic • shoes • trash`
 
 ---
 
-##  Image Classification
+## Image Classification Module
 
-**Model:** CNN with Transfer Learning (pretrained backbone)  
-**Dataset:** Custom waste images  
-**Performance:**  
-- Accuracy: 83.92%  
-- Weighted F1-Score: 0.83  
+**Architecture:** Transfer Learning (EfficientNet backbone)  
+**Framework:** PyTorch  
+**Validation Accuracy:** 83.92%  
+**Weighted F1-Score:** 0.83  
 
-**Pipeline:**
-- Image preprocessing & resizing  
-- Data augmentation  
-- Train/Validation split  
-- Weighted loss for class imbalance  
-- Evaluation: Accuracy, Confusion Matrix, F1-score  
+### Training Setup
+- 15,806 training images  
+- 3,956 validation images  
+- Weighted CrossEntropy Loss (class imbalance handling)  
+- MLflow for experiment tracking & model logging  
 
 ---
 
 ##  NLP Waste Report Module
 
-**Tasks:** Multi-task text classification  
-- Issue Classification  
-- Priority Detection  
+Multi-task text classification for:
+
+- Issue Type Detection  
+- Priority Classification  
 - Risk Assessment  
 
-**Models:**  
-- Baseline: TF-IDF + Logistic Regression  
-- Advanced: LSTM Multi-output  
-- Experimental: BERT (Transformer)  
+**Models Used:**
+- TF-IDF + Logistic Regression (baseline)  
+- LSTM (multi-output)  
+- BERT (experimental transformer model)  
 
-**Dataset Sources:**  
-- NYC 311 Service Requests  
-- Kaggle service complaint datasets  
-- Custom synthetic text data  
-
----
-
+**Data Sources:** NYC 311, Kaggle datasets, synthetic reports  
 
 ---
 
 ##  Tech Stack
 
-- Python  
-- PyTorch, Torchvision  
-- TensorFlow / Keras (optional NLP)  
-- Scikit-learn, NLTK, SpaCy  
-- NumPy, Pandas, Matplotlib  
-- FastAPI, Uvicorn  
+- PyTorch  
+- Scikit-learn  
+- MLflow  
+- FastAPI  
+- Uvicorn  
+- NLTK / SpaCy  
 
 ---
 
-##  API
-
-The project includes a FastAPI application for serving the waste classification model.
+##  API (FastAPI)
 
 ### Endpoints
 
-- `GET /`: Root endpoint
-- `GET /health`: Health check
-- `POST /predict`: Predict waste category from image upload
+- `GET /` – API status  
+- `GET /health` – Health check  
+- `POST /predict` – Image classification  
 
-### Running the API
+### Run locally
 
-1. Install dependencies: `pip install -r requirements.txt`
-2. Run the server: `uvicorn app:app --reload`
-3. Access Swagger UI at `http://127.0.0.1:8000/docs`
+```bash
+pip install -r requirements.txt
+uvicorn app:app --reload
 
-### Testing
+Swagger UI:
+http://127.0.0.1:8000/docs
 
-Run tests with: `pytest test_api.py`
+Future Improvements
 
----
+Full fine-tuning of backbone
 
-##  Future Work
+Hybrid Image + Text fusion model
 
-- Full backbone fine-tuning  
-- Hybrid image + text prediction system  
-- Real-time dashboard & GIS integration  
-- Web/Mobile deployment  
-- Advanced multi-task transformer models  
+Real-time dashboard integration
 
----
+Cloud & container deployment
 
 ##  Author
 
