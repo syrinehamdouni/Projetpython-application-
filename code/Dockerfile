@@ -1,19 +1,14 @@
-# -------------------
-# Base image with PyTorch preinstalled
-# -------------------
-FROM pytorch/pytorch:2.2.0-cuda11.8-cudnn8-runtime
+FROM python:3.11
 
-# Set working directory
 WORKDIR /app
 
-# Copy only requirements and app
-COPY requirements.txt app.py ./
+COPY requirements.txt .
 
-# Install remaining Python dependencies (lighter ones)
+RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Expose FastAPI port
+COPY . .
+
 EXPOSE 8000
 
-# Run the FastAPI app
 CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
