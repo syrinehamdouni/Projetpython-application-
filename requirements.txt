@@ -1,20 +1,21 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
+fastapi
+uvicorn
+pillow
+torch==2.2.2+cpu
+torchvision==0.17.2+cpu
+
 pandas
 requests
 beautifulsoup4
 matplotlib
 seaborn
 numpy
-fastapi
-uvicorn
-torch
-torchvision
 pillow
 python-multipart
 mlflow
 scikit-learn
 pytest
-fastapi
-uvicorn
 mlflow
 torch
 torchvision
